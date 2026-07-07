@@ -1,0 +1,69 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+@import "tailwindcss";
+
+
+@theme {
+  --font-serif: 'Space Grotesk', sans-serif;
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: #0B0E14; /* Warm off-white */
+  color: #A5B4FC;
+}
+
+.serif {
+  font-family: var(--font-serif);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0B0E14;
+}
+::-webkit-scrollbar-thumb {
+  background: #00E5FF;
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #FF0055;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+.markdown-body {
+  font-family: var(--font-sans);
+  color: #E0E7FF;
+  line-height: 1.6;
+}
+.markdown-body h1, .markdown-body h2, .markdown-body h3, .markdown-body h4 {
+  font-family: var(--font-serif);
+  color: #00E5FF;
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+}
+.markdown-body h1 { font-size: 2.25rem; font-weight: 700; margin-bottom: 1rem; border-bottom: 1px solid rgba(0,229,255,0.2); padding-bottom: 0.5rem; }
+.markdown-body h2 { font-size: 1.75rem; font-weight: 600; margin-top: 2rem; }
+.markdown-body h3 { font-size: 1.5rem; font-weight: 500; }
+.markdown-body p { margin-bottom: 1rem; }
+.markdown-body ul { list-style-type: disc; margin-left: 1.5rem; margin-bottom: 1rem; }
+.markdown-body ol { list-style-type: decimal; margin-left: 1.5rem; margin-bottom: 1rem; }
+.markdown-body li { margin-bottom: 0.25rem; }
+.markdown-body strong { color: #fff; font-weight: 600; }
+.markdown-body blockquote { border-left: 4px solid #FF0055; padding-left: 1rem; color: #A5B4FC; margin: 1rem 0; font-style: italic; }
+.markdown-body hr { border-color: rgba(0,229,255,0.1); margin: 2rem 0; }
+.markdown-body table { width: 100%; margin-bottom: 1.5rem; border-collapse: collapse; }
+.markdown-body th, .markdown-body td { border: 1px solid rgba(0,229,255,0.2); padding: 0.75rem; text-align: left; }
+.markdown-body th { background-color: rgba(0,229,255,0.05); font-weight: 600; color: #00E5FF; }
