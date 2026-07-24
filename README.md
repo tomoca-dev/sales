@@ -1,3 +1,17 @@
+# Tomoca Coffee Sales Platform
+
+## Render deployment
+
+This package is prepared for Render as a single Node Web Service. Use `render.yaml` or manually set Build Command to `npm ci && npm run build`, Start Command to `npm start`, and Health Check Path to `/healthz`. See `RENDER_DEPLOYMENT_GUIDE.md` for the complete step-by-step guide.
+
+
+## Production deployment note
+
+If the app works locally but deployed pages do not fetch data, check `DEPLOYMENT_FIX.md` first. This system requires the Express + Socket.IO server in `server.ts`; deploying only the Vite `dist` folder will make `/socket.io` and `/api/*` return 404.
+
+Run `fix_supabase_profiles_500_and_imports.sql` in Supabase SQL Editor if the browser shows a 500 error on the `profiles` table.
+
+
 # TOMOCA Coffee Platform
 
 A React/Vite + Express + Socket.IO business platform backed by Supabase. Monetary dashboards use ETB only; no hardcoded foreign-exchange rates are displayed.

@@ -140,6 +140,15 @@ const getSupabaseAccessToken = async (): Promise<string> => {
   return token;
 };
 
+const getApiBaseUrl = () => {
+  const configuredUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_SOCKET_URL || '';
+  return String(configuredUrl).replace(/\/$/, '');
+};
+
+const apiUrl = (path: string) => `${getApiBaseUrl()}${path}`;
+
+const getSocketUrl = () => getApiBaseUrl() || undefined;
+
 const RoleRoute = ({ user, roles, children }: { user: UserProfile; roles: UserRole[]; children: React.ReactNode }) => {
   if (user.role === 'Admin' || user.role === 'Management' || roles.includes(user.role)) return <>{children}</>;
   return <Navigate to="/profile" replace />;
@@ -149,12 +158,16 @@ const buildUserProfileFromSupabaseUser = async (authUser: any, fallbackRole?: Us
   let profileData: any = null;
   if (supabase) {
     try {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('profiles')
         .select('full_name, role, wallet_balance, loyalty_points')
         .eq('id', authUser.id)
         .maybeSingle();
-      profileData = data;
+      if (error) {
+        console.warn('Could not load profile row; falling back to auth metadata.', error.message);
+      } else {
+        profileData = data;
+      }
     } catch (err) {
       console.warn('Could not load profile row; falling back to auth metadata.', err);
     }
@@ -2849,7 +2862,11 @@ export default function App() {
 
       if (cancelled) return;
 
-      activeSocket = io({ auth: { token, user } });
+      activeSocket = io(getSocketUrl(), {
+        auth: { token, user },
+        transports: ['websocket', 'polling'],
+        withCredentials: false
+      });
       socket = activeSocket;
 
       activeSocket.on('sync', (state) => {
@@ -3397,7 +3414,7 @@ const AIReportPage = ({
       });
 
       const token = await getSupabaseAccessToken();
-      const res = await fetch('/api/generate-advanced-report', {
+      const res = await fetch(apiUrl('/api/generate-advanced-report'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ startDate, endDate, filteredOrders, filteredPayments, uploadedFile })
@@ -3780,7 +3797,7 @@ const SalesDashboard = ({
 
   const processFile = async (file: File, data: string, mimeType: string, fileHash: string) => {
     const token = await getSupabaseAccessToken();
-    const response = await fetch('/api/parse-historical-sales', {
+    const response = await fetch(apiUrl('/api/parse-historical-sales'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       body: JSON.stringify({
@@ -4467,7 +4484,7 @@ const OrderCreation = ({ addToCart, removeFromCart, updateCartQuantity, placeOrd
       });
 
       const token = await getSupabaseAccessToken();
-      const res = await fetch('/api/parse-receipt', {
+      const res = await fetch(apiUrl('/api/parse-receipt'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ fileData: base64Data, mimeType: file.type, paymentMethod: customer.paymentMethod })

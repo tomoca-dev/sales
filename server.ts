@@ -19,7 +19,7 @@ async function startServer() {
     }
   });
 
-  const PORT = 3000;
+  const PORT = Number(process.env.PORT) || 3000;
 
   // Runtime state cache loaded from and persisted to Supabase
   let orders: Order[] = [];
@@ -406,6 +406,15 @@ async function startServer() {
 
   app.use(express.json({ limit: '50mb' }));
 
+  app.get('/healthz', (_req, res) => {
+    res.json({
+      ok: true,
+      service: 'tomoca-sales-platform',
+      supabase: Boolean(supabaseAdmin),
+      time: new Date().toISOString()
+    });
+  });
+
   const requireHttpRoles = (allowedRoles: UserRole[]) => async (req: any, res: any, next: any) => {
     if (!supabaseAdmin) {
       return res.status(503).json({ error: 'Supabase server authentication is not configured.' });
@@ -568,7 +577,7 @@ async function startServer() {
   };
 
   // API Routes
-  app.post('/api/parse-historical-sales', async (req: any, res) => {
+  app.post('/api/parse-historical-sales', requireHttpRoles(['Sales Rep', 'Admin', 'Management']), async (req: any, res) => {
     const importId = randomUUID();
     const now = new Date().toISOString();
     const { fileData, mimeType, dateMode, specificDate, fileName, fileHash } = req.body || {};
